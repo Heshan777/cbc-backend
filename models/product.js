@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema({
     altNames :{
         type: [String],
         default : [],
-        required: true
+        required: false
     },
     description : {
         type : String,
@@ -29,7 +29,7 @@ const productSchema = new mongoose.Schema({
         type : Number,
         required : true
     },
-    labeledPrice:{
+    labelledPrice:{
         type : Number,
         required: true 
     },
@@ -44,5 +44,5 @@ const productSchema = new mongoose.Schema({
     }
 }) 
 
-const product = mongoose.model("product",productSchema)
-export default product
+const product = mongoose.model("product",productSchema) 
+export default product 
