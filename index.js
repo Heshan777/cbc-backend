@@ -1,59 +1,60 @@
-import express from 'express';
-import mongoose from 'mongoose'; 
-import Student from './models/student.js';
-import studentRouter from './routes/studentRouter.js';
-import userRouter from './routes/userRouter.js';
+import express from "express";
+import mongoose from "mongoose";
+import userRouter from "./routes/userRouter.js";
 import jwt from "jsonwebtoken";
-import product from './models/product.js';
-import productRouter from './routes/productRouter.js';
+import productRouter from "./routes/productRouter.js";
+import cors from "cors";
+import dotenv from "dotenv";
 
-const app = express();
-app.use(express.json());
+dotenv.config();
+
+const app = express()
+app.use(cors())
+
+app.use(express.json())
 
 app.use(
     (req,res,next)=>{
-      let token = req.header("Authorization")
-      token = token.replace("Bearer ","")
-      if(token!=null){
-         console.log(token)
-         jwt.verify(token,"jwt-secret",
-            (err,decoded)=>{
-                 if(decoded==null){
-                    res.json(
-                        {
-                            message: "invalid token please login again"
-                        }
-                    )
-                    return 
-                 }else{
-                    req.user = decoded
-                 }
-         })
-    }next()
-    }
-) 
 
-const connectionstring = "mongodb+srv://admin:17500@cluster0.bccs5ds.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
- mongoose.connect(connectionstring).then(
+        let token = req.header("Authorization")
+
+        if(token != null){
+            token = token.replace("Bearer ","")
+            jwt.verify(token, process.env.JWT_SECRET,
+                (err, decoded)=>{
+                    if(decoded == null){
+                        res.json({
+                            message: "Invalid token please login again"
+                        })
+                        return
+                    }else{
+                        req.user = decoded
+                    }
+                }
+            )
+
+        }
+        next()
+    }
+)
+const connectionString = process.env.MONGO_URI
+
+
+mongoose.connect(connectionString).then(
     ()=>{
-        console.log("database connected successfully")
+        console.log("Database connected Successfully")
     }
- ).catch(
+).catch(
     ()=>{
-        console.log("error occur")
+        console.log("Database connection failed")
     }
- )
-
- app.use('/students',studentRouter);
- app.use('/users', userRouter);
- app.use('/products',productRouter);
- 
-
- 
+)
+app.use("/api/users",userRouter)
+app.use("/api/products", productRouter)
 
 
-
-
-app.listen(5000, ()=>{
-    console.log("server is running o port 5000");
-});
+app.listen(5000, 
+    ()=>{
+        console.log("Server is running on port 5000")
+    }
+)

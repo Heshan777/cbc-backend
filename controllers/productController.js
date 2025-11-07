@@ -29,6 +29,7 @@ export async function createProduct(req, res) {
 }
 
 export async function getProducts(req, res) {
+    console.log("fetching products")
     try {
         const products = await product.find();
         res.json(products);
